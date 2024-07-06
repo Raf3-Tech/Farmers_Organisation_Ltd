@@ -1,0 +1,24 @@
+<?php if(isset($_SESSION['id'])): ?>
+  <li class="dropdown">
+      <a href="#">
+
+        <img src="<?php echo BASE_URL . '/assets/media/user.png'?>" alt="user" id="drop-img">
+        <?php echo $_SESSION['username']; ?>
+        <img src="<?php echo BASE_URL . '/assets/media/drop.png'?>" alt="user" id="drop-img">
+
+      </a>
+
+    <ul class="dropdown-content">
+<?php if($_SESSION['admin']): ?>
+    <li><a href="<?php echo BASE_URL . '/admin/dashboard.php' ?>">Dashboard</a></li>
+<?php endif; ?>
+
+    <li><a href="<?php echo BASE_URL . '../logout.php'; ?>" class="logout">Logout</a></li>
+    </ul>
+  </li>
+<?php else: ?>
+    <li><a href="#" onclick="document.getElementById('id01').style.display='block'">LogIn</a></li>
+    <li><a href="#" onclick="document.getElementById('id02').style.display='block'">SignUp</a></li>
+<?php endif; ?>
+
+1006 1715 39 

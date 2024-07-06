@@ -1,0 +1,447 @@
+
+<?php 
+    require('connect.php');
+
+// print function    
+    function dd($value)// to be deleted
+    {
+        echo "<pre>", print_r($value, true), "</pre>";
+        die();
+    }
+
+//query execution function    
+    function executeQuery($sql, $data)
+    {
+        global $conn;
+        $stmt = $conn->prepare($sql);
+        $values = array_values($data);
+        $types = str_repeat('s', count($values));
+        $stmt->bind_param($types, ...$values);
+        $stmt->execute();
+
+        return $stmt;
+    }
+
+
+    
+// function for selecting all records in a table
+    function selectAll($table, $conditions = []){
+        global $conn;
+
+        $sql = " SELECT * FROM $table ";
+
+        if (empty($conditions)) {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        return $records;
+        } else {
+            // return records that match conditions ...
+            // $sql = "select * from $table where username='raf3' and admin=1";
+
+            $i = 0;
+            foreach ($conditions as $key => $value){
+                if ($i === 0) {
+                    $sql = $sql . " WHERE $key = ?"; 
+                }else {
+                    $sql = $sql . " AND $key = ?";
+                }
+                $i++;
+            }
+            
+        $stmt = executeQuery($sql, $conditions);
+        $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        return $records;
+        }
+
+    }
+
+
+// function for selecting one record in a table
+   
+    function selectOne($table, $conditions) {
+        global $conn;
+        $sql = "SELECT * FROM $table";
+        
+        $i = 0;
+        foreach ($conditions as $key => $value) {
+            if ($i === 0) {
+                $sql .= " WHERE $key = ?";
+            } else {
+                $sql .= " AND $key = ?";
+            }
+            $i++;
+        }
+    
+        $sql .= " LIMIT 1";
+    
+        $stmt = executeQuery($sql, $conditions);
+        $records = $stmt->get_result()->fetch_assoc();
+    
+        return $records;
+    }
+
+
+    //create function
+    function create($table, $data)
+    {
+        global $conn;
+
+        //$sql = "INSERT INTO users SET username = ?, admin=?, email=?, password=?"
+
+        $sql = "INSERT INTO $table SET ";
+
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if ($i === 0) {
+                $sql .= " $key = ?";
+            } else {
+                $sql .= ", $key = ?";
+            }
+            $i++;
+        }
+
+        $stmt = executeQuery($sql, $data);
+        $id = $stmt->insert_id;
+        return $id;
+
+    }
+
+    //update function
+    function update($table, $id, $data)
+    {
+        global $conn;
+
+        //$sql = "UPDATE INTO users SET username = ?, admin=?, email=?, password=? WHERE id=?"
+
+        $sql = "UPDATE $table SET ";
+
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if ($i === 0) {
+                $sql .= " $key = ?";
+            } else {
+                $sql .= ", $key = ?";
+            }
+            $i++;
+        }
+
+        $sql .= " WHERE id=?";
+        $data['id'] = $id;
+        $stmt = executeQuery($sql, $data);
+        $id = $stmt->insert_id;
+        return $stmt->affected_rows;
+
+    }
+
+    // delete function
+    function delete($table, $id)
+    {
+        global $conn;
+
+        //$sql = "DELETE FROM users WHERE id=?"
+
+        $sql = "DELETE FROM $table WHERE id=? ";
+
+        $stmt = executeQuery($sql, ['id' => $id]);
+        return $stmt->affected_rows;
+
+    }
+    
+    $data = [
+
+        'username' => 'mickey',
+        'admin' => 1,
+        'email' => 'mike@rafe.com',
+        'password' => 'mickeey'
+    ];
+    
+    // invocation of functions
+    // $id = create('users', $data);
+    // dd($id);
+    
+
+//    other other other
+
+<?php 
+require('connect.php');
+
+// Print function    
+function dd($value)
+{
+    echo "<pre>", print_r($value, true), "</pre>";
+    die();
+}
+
+function executeQuery($sql, $data)
+{
+    global $conn;
+    $stmt = $conn->prepare($sql);
+    $values = array_values($data);
+    $types = str_repeat('s', count($values));
+    $stmt->bind_param($types, ...$values);
+    $stmt->execute();
+
+    return $stmt;
+}
+
+function create($table, $data)
+{
+    global $conn;
+
+    //$sql = "INSERT INTO users SET username = ?, admin=?, email=?, password=?"
+
+    $sql = "INSERT INTO $table SET ";
+
+    $i = 0;
+    foreach ($data as $key => $value) {
+        if ($i === 0) {
+            $sql .= " $key = ?";
+        } else {
+            $sql .= ", $key = ?";
+        }
+        $i++;
+    }
+
+    $stmt = executeQuery($sql, $data);
+    $id = $stmt->insert_id;
+    return $id;
+}
+
+
+// Query execution function    
+// function executeQuery($sql, $data)
+// {
+//     global $conn;
+//     $stmt = $conn->prepare($sql);
+
+//     if ($stmt === false) {
+//         return false;
+//     }
+
+//     $types = '';
+//     $params = [];
+
+//     foreach ($data as $value) {
+//         if (is_int($value)) {
+//             $types .= 'i';
+//         } elseif (is_float($value)) {
+//             $types .= 'd';
+//         } elseif (is_string($value)) {
+//             $types .= 's';
+//         } else {
+//             $types .= 'b';
+//         }
+//         $params[] = $value;
+//     }
+
+//     $bindParams = array_merge([$types], $params);
+
+//     $bindParamsReferences = [];
+//     foreach ($bindParams as $key => $value) {
+//         $bindParamsReferences[$key] = &$bindParams[$key];
+//     }
+
+//     if (!call_user_func_array([$stmt, 'bind_param'], $bindParamsReferences)) {
+//         return false;
+//     }
+
+//     $stmt->execute();
+
+//     return $stmt;
+// }
+
+// function executeQuery($sql, $data)
+//     {
+//         global $conn;
+//         $stmt = $conn->prepare($sql);
+//         $values = array_values($data);
+//         $types = str_repeat('s', count($values));
+//         $stmt->bind_param($types, ...$values);
+//         $stmt->execute();
+
+//         return $stmt;
+//     }
+
+
+// Function for selecting all records in a table
+// function selectAll($table, $conditions = [])
+// {
+//     global $conn;
+
+//     $sql = "SELECT * FROM $table";
+
+//     if (!empty($conditions)) {
+//         $sql .= " WHERE ";
+
+//         $i = 0;
+//         foreach ($conditions as $key => $value) {
+//             if ($i > 0) {
+//                 $sql .= " AND ";
+//             }
+//             $sql .= "$key = ?";
+//             $i++;
+//         }
+//     }
+
+//     $stmt = executeQuery($sql, $conditions);
+//     $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+//     return $records;
+// }
+
+function selectAll($table, $conditions = []){
+    global $conn;
+
+    $sql = "SELECT * FROM $table";
+    if (empty($conditions)) { 
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        return $records;
+    } else {
+        // return records that match conditions ...
+            // $sql = "select * from $table where username='raf3' and admin=1";
+
+            $i = 0;
+            foreach ($conditions as $key => $value){
+                if ($i === 0) {
+                    $sql = $sql . " WHERE $key = $value"; 
+                }else {
+                    $sql = $sql . " AND $key = $value";
+                }
+                $i++;
+            }
+        dd($sql);
+
+        $stmt = executeQuery($sql, $conditions);
+        $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        return $records;
+    }
+}
+
+$conditions = [
+    'admin' => 0,
+    'username' => 'zen'
+];
+
+// Function for selecting one record in a table
+function selectOne($table, $conditions) {
+    global $conn;
+    $sql = "SELECT * FROM $table";
+    
+    $i = 0;
+    foreach ($conditions as $key => $value) {
+        if ($i === 0) {
+            $sql .= " WHERE $key = ?";
+        } else {
+            $sql .= " AND $key = ?";
+        }
+        $i++;
+    }
+
+    $sql .= " LIMIT 1";
+
+    $stmt = executeQuery($sql, $conditions);
+    $records = $stmt->get_result()->fetch_assoc();
+
+    return $records;
+}
+
+
+// Create function
+// function create($table, $data)
+// {
+//     global $conn;
+
+//     $keys = implode(', ', array_keys($data));
+//     $placeholders = str_repeat('?, ', count($data) - 1) . '?';
+//     $sql = "INSERT INTO $table ($keys) VALUES ($placeholders)";
+
+//     $stmt = executeQuery($sql, $data);
+
+//     if ($stmt === false) {
+//         return false;
+//     }
+
+//     $id = $stmt->insert_id;
+
+//     return $id;
+// }
+
+// function create($table, $data)
+//     {
+//         global $conn;
+
+//         //$sql = "INSERT INTO users SET username = ?, admin=?, email=?, password=?"
+
+//         $sql = "INSERT INTO $table SET ";
+
+//         $i = 0;
+//         foreach ($data as $key => $value) {
+//             if ($i === 0) {
+//                 $sql .= " $key = ?";
+//             } else {
+//                 $sql .= ", $key = ?";
+//             }
+//             $i++;
+//         }
+
+//         $stmt = executeQuery($sql, $data);
+//         $id = $stmt->insert_id;
+//         return $id;
+
+//     }
+
+
+// Update function
+function update($table, $id, $data)
+{
+    global $conn;
+
+    $set = '';
+    $i = 0;
+    foreach ($data as $key => $value) {
+        if ($i > 0) {
+            $set .= ', ';
+        }
+        $set .= "$key = ?";
+        $i++;
+    }
+
+    $sql = "UPDATE $table SET $set WHERE id = ?";
+    $data['id'] = $id;
+
+    $stmt = executeQuery($sql, $data);
+    $affectedRows = $stmt->affected_rows;
+
+    return $affectedRows;
+}
+
+// Delete function
+function delete($table, $id)
+{
+    global $conn;
+
+    $sql = "DELETE FROM $table WHERE id = ?";
+    $stmt = executeQuery($sql, ['id' => $id]);
+
+    return $stmt->affected_rows;
+}
+
+// $data = [
+//     'username' => 'neeeef',
+//     'admin' => 0,
+//     'email' => 'nef@rafe.com',
+//     'password' => 'neef'
+// ];
+
+// Invocation of functions
+// $id = selectOne('users', $conditions);
+// dd($id);
+?>
+
+
+

@@ -1,0 +1,35 @@
+.admin_login {
+	text-align: center;
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: hsl(228, 15%, 20%);
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 3px solid hsla(162, 100%, 40%, 1);
+  border-radius: .5rem;
+  outline: none;
+  width: 70%; /* Could be more or less, depending on screen size */
+  padding: 10px;
+}
+
+.contact__input {
+  padding: 1rem 1.25rem;
+  border-radius: .5rem;
+  background-color: #000d1a;
+  color: hsl(162, 100%, 40%);;
+}
+
+.username_input,
+.password_input {
+	font-size: 15px;
+	color: var(--first-color);
+}
+
+.row1 {
+	background-color: var(--body-color);
+}
+
+.row2 {
+	background-color: #000d1a;
+}

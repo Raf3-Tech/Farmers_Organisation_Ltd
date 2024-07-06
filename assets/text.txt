@@ -1,0 +1,13 @@
+========== example text message ================
+
+Name::  Customer
+
+Email:: customeremail@maail.io
+
+PestName:: PestName
+
+Location:: {{checkbox}}
+
+Datetime:: {{spray_date}}
+
+Message:: There is a huge infestation at our house located at, i would like to request pest control services.
